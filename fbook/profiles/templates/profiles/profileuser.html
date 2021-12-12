@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}
+mój profil
+{% endblock title %}
+
+{% block content %}
+    <!--jeśli aktualizacja się powiedzie to wyświetli się wiadomość w zielonej ramce-->
+    {% if confirm_form %}
+    <div class="ui green message">Twój profil został zaktualizowany</div>
+    {% endif %}
+    {% if not_confirm_form %}
+    <div class="ui red message">Twój profil nie został zaktualizowany</div>
+    {% endif %}
+
+    <!--dzięki poniższej linijce będzie można wysyłać obraz oraz fromularz będzie miał semantykę -->
+    <form action="" method="POST" class="ui form" enctype='multipart/form-data'>
+    {% csrf_token %}
+        {{ form_upd.as_p }}
+        <button type='submit' class='ui positive button'>zaktualizuj profil</button>
+    </form>
+{% endblock content %}
