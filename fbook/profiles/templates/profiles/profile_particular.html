@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{%  block title %}Zobacz profil użytkownika
+{% endblock title %}
+{%  block content %}
+    <div class="ui grid">
+        <br>
+        <div class="row">
+            <!--układ wielokolumnowy-->
+            <!--dane i statystyki-->
+            <div class="five wide column">
+                <img class="ui medium rounded image" src={{ object.avatar.url }}>
+                <table class="ui table">
+                    <tbody>
+                        <tr>
+                            <td>Użytkownik</td>
+                            <td>{{ object.user }}</td>
+                        </tr>
+                        {% if object.first_name != "" %}
+                            <tr>
+                                <td>Imie</td>
+                                <td>{{ object.first_name }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if object.last_name != "" %}
+                            <tr>
+                                <td>Nazwisko</td>
+                                <td>{{ object.last_name }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if object.country != "" %}
+                            <tr>
+                                <td>Miejsce zamieszkania</td>
+                                <td>{{ object.country }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if object.email != "" %}
+                            <tr>
+                                <td>Email</td>
+                                <td>{{ object.email }}</td>
+                            </tr>
+                        {% endif %}
+                        <tr>
+                            <td>Biografia</td>
+                            <td>{{ object.bio }}</td>
+                        </tr>
+                        <tr>
+                            <td>Data dołączenia</td>
+                            <td>{{ object.created }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!--Jeśli użytkownik nie przyjaźni się z tym użytkownikem, oraz nie wysłał zaproszenia to można dodać go do znajomych-->
+                    {% if object.user not in receiver_relation_list and object.user not in sender_relation_list %}
+                        <form action="{% url 'profiles:invite-send' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="profile_pk" value="{{ object.pk }}">
+                            <button type="submit" class="ui primary button marginb">
+                                <i class="plus square icon"></i>Dodaj do znajomych
+                            </button>
+                        </form>
+                    {% endif %}
+                    <!--Jeśli wysłano już zaproszenie do znajomych-->
+                    {% if object.user in receiver_relation_list and request.user not in object.friends.all %}
+                        <button class="ui disable button">
+                            <i class="user icon"></i>Wysłano zaproszenie
+                        </button>
+                    {% endif %}
+                    <!--Jeśli użytkownik się przyjaźni z danych użytkowniem to może go usunąć-->
+                    {% if request.user in object.friends.all %}
+                        <form action="{% url 'profiles:remove-friends' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="profile_pk" value="{{ object.pk }}">
+                            <button type="submit" class="ui primary button marginb">
+                                <i class="minus square icon"></i>Usuń ze znajomych
+                            </button>
+                        </form>
+                    {% endif %}
+
+
+                <div class="ui vertical fluid menu">
+                    <div class="item">
+                        Liczba znajomych
+                        <div class="ui label">{{ object.get_count_friends }}</div>
+                    </div>
+                    <div class="item">
+                        Posty
+                        <div class="ui label">{{ object.get_count_posts }}</div>
+                    </div>
+                    <div class="item">
+                        Polubienia
+                        <div class="ui label">{{ object.get_count_likes }}</div>
+                    </div>
+                    <div class="item">
+                        Otrzymane polubienia
+                        <div class="ui label">{{ object.get_count_received_likes }}</div>
+                    </div>
+                </div>
+            </div>
+            <!--posty-->
+            <div class="eleven wide column">
+                {% if post_user_len %}
+                    {% for post in posts %}
+                        <div class="ui segment fluid">
+                            {{ post.content }}
+                        </div>
+                    {% endfor %}
+                    {% else %}
+                        <h3>{{ object.user }}&nbspnie ma żadnych opublikowanych postów</h3>
+
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}

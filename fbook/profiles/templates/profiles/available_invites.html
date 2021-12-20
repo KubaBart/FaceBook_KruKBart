@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Nieznajomi{% endblock title %}
+{% block content %}
+    <ul>
+        {% for object in set_of_queries %}
+            <li>{{ object }}</li>
+        {% endfor %}
+    </ul>
+{% endblock content %}

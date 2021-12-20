@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Wszyscy użytkownicy{% endblock title %}
+{% block content %}
+    <!--Jeśli nie ma żadnego profilu to wyświetl-->
+    {% if is_empty %}
+        <h3>Nie ma profilów</h3>
+    {% endif %}
+    <!--wyświetlanie użytkowników-->
+    {% for x in object_list %}
+        <div class="ui fluid card">
+            <div class="content">
+                <div class="ui grid">
+                    <div class="row">
+                        <!--układ wielokolumnowy-->
+                        <div class="three wide column">
+                            <!--Okrągłe zdjęcie profilowe-->
+                            <img class="ui small circular image" src="{{x.avatar.url}}">
+                        </div>
+                        <!--przycisk zależnie od relacji-->
+                        <div class="nine wide column">
+                            <!--informacje o użytkowniku-->
+                            <h2>{{ x.user }}</h2>
+                            <p>{{ x.bio }}</p>
+                            <a href={{ x.get_show_profil }}>
+                                <button class="ui primary button marginb">Zobacz profil</button>
+                            </a>
+                        </div>
+                        <div class="four wide column">
+                            <!--Jeśli użytkownik nie przyjaźni się z tym użytkownikem, oraz nie wysłał zaproszenia to można dodać go do znajomych-->
+                            {% if x.user not in receiver_relation_list and x.user not in sender_relation_list %}
+                                <form action="{% url 'profiles:invite-send' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="profile_pk" value="{{ x.pk }}">
+                                    <button type="submit" class="ui primary button marginb">
+                                        <i class="plus square icon"></i>Dodaj do znajomych
+                                    </button>
+                                </form>
+                            {% endif %}
+                            <!--Jeśli wysłano już zaproszenie do znajomych-->
+                            {% if x.user in receiver_relation_list and request.user not in x.friends.all %}
+                                <button class="ui disable button">
+                                    <i class="user icon"></i>Wysłano zaproszenie
+                                </button>
+                            {% endif %}
+                            <!--Jeśli użytkownik się przyjaźni z danych użytkowniem to może go usunąć-->
+                            {% if request.user in x.friends.all %}
+                                <form action="{% url 'profiles:remove-friends' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="profile_pk" value="{{ x.pk }}">
+                                    <button type="submit" class="ui primary button marginb">
+                                        <i class="minus square icon"></i>Usuń ze znajomych
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock content %}

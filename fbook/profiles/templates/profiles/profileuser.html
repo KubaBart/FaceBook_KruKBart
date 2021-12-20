@@ -5,18 +5,120 @@ mój profil
 {% endblock title %}
 
 {% block content %}
-    <!--jeśli aktualizacja się powiedzie to wyświetli się wiadomość w zielonej ramce-->
-    {% if confirm_form %}
-    <div class="ui green message">Twój profil został zaktualizowany</div>
-    {% endif %}
-    {% if not_confirm_form %}
-    <div class="ui red message">Twój profil nie został zaktualizowany</div>
-    {% endif %}
 
-    <!--dzięki poniższej linijce będzie można wysyłać obraz oraz fromularz będzie miał semantykę -->
-    <form action="" method="POST" class="ui form" enctype='multipart/form-data'>
-    {% csrf_token %}
-        {{ form_upd.as_p }}
-        <button type='submit' class='ui positive button'>zaktualizuj profil</button>
-    </form>
+    <!--https://semantic-ui.com/modules/modal.html#/definition-->
+    <!--okno modalne-->
+    <div class="ui modal modaluser">
+        <i class="close icon"></i>
+        <div class="header">
+            Aktualizuj swój profil
+        </div>
+        <div class="image content">
+            <div class="ui medium image">
+                <img src="{{ profile.avatar.url }}">
+            </div>
+            <div class="description">
+                <div class="ui header">najnowsze informacje o tobie</div>
+                <!--dzięki poniższej linijce będzie można wysyłać obraz oraz fromularz będzie miał semantykę -->
+                <form action="" method="POST" class="ui form" enctype='multipart/form-data'>
+                    {% csrf_token %}
+                    {{ form_upd.as_p }}
+            </div>
+        </div>
+        <div class="actions">
+            <button type='submit' class="ui positive right labeled icon button">
+                Zaktualizuj
+                <i class="checkmark icon"></i>
+            </button>
+            </form>
+        </div>
+    </div>
+    <!--semantyczny interfejs użytkownika-->
+    <div class="ui segment">
+        <!--jeśli aktualizacja się powiedzie to wyświetli się wiadomość w zielonej ramce-->
+        {% if confirm_form %}
+        <div class="ui green message">Twój profil został zaktualizowany</div>
+        {% endif %}
+        <!--jeśli nie to czerwony komunikat-->
+        {% if not_confirm_form %}
+        <div class="ui red message">Twój profil nie został zaktualizowany</div>
+        {% endif %}
+        <h2>Mój profil: {{ request.user }}</h2>
+        <!--układy wielokolumnowe-->
+        <div class="ui grid">
+            <div class="row">
+                <div class="five wide column">
+                    <img class="ui medium rounded image" src={{ profile.avatar.url }}>
+                    <div class="row margint">
+                        <button class="ui secondary button" id='modal-btn'>Zaktualizuj swój profil</button>
+                    </div>
+                </div>
+                <div class="ten wide column">
+                <!--tabelka dla informacji o użytkowniku-->
+                    <table class="ui table">
+                        <tbody>
+                            <tr>
+                                <td>Użytkownik</td>
+                                <td>{{ profile.user }}</td>
+                            </tr>
+                            <tr>
+                                <td>Imie</td>
+                                <td>{{ profile.first_name }}</td>
+                            </tr>
+                            <tr>
+                                <td>Nazwisko</td>
+                                <td>{{ profile.last_name }}</td>
+                            </tr>
+                            <tr>
+                                <td>Miejsce zamieszkania</td>
+                                <td>{{ profile.country }}</td>
+                            </tr>
+                            <tr>
+                                <td>Email</td>
+                                <td>{{ profile.email }}</td>
+                            </tr>
+                            <tr>
+                                <td>Biografia</td>
+                                <td>{{ profile.bio }}</td>
+                            </tr>
+                            <tr>
+                                <td>Data dołączenia</td>
+                                <td>{{ profile.created }}</td>
+                            </tr>
+                            <tr>
+                                <td>Liczba postów</td>
+                                <td>{{ profile.get_count_posts }}</td>
+                            </tr>
+                            <tr>
+                                <td>Liczba polubionych postów</td>
+                                <td>{{ profile.get_count_likes }}</td>
+                            </tr>
+                            <tr>
+                                <td>Liczba nie polubionych postów</td>
+                                <td>{{ profile.get_count_unlikes }}</td>
+                            </tr>
+                            <tr>
+                                <td>Liczba otrzymanych polubionych/nie polubionych postów</td>
+                                <td>{{ profile.get_count_received_likes }}</td>
+                            </tr>
+                            <tr>
+                                <td>Liczba znajomych</td>
+                                <td>{{ profile.get_count_friends }}</td>
+                            </tr>
+                            <tr>
+                                <td>Lista znajomych</td>
+                                <td>
+                                    <ul>
+                                        {% for friend in profile.get_friends %}
+                                        <li>{{ friend }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock content %}

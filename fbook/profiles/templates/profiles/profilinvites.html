@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Zaproszenia{% endblock title %}
+{% block content %}
+    {% if empty %}
+        <h3>Nie masz żadnych zaproszeń</h3>
+    {% endif %}
+    {% for x in set_of_queries %}
+        <div class="ui segment">
+            <div class="ui grid">
+                <div class="row">
+                    <!--układ wielokolumnowwy-->
+                    <div class="four wide column">
+                        <!--małe okrągłe zdjęcie awatara-->
+                        <img class="ui small circular image" src={{ x.avatar.url}}>
+                    </div>
+                    <div class="eight wide column">
+                        <h2>{{ x.user }}</h2>
+                        <p>{{ x.bio }}</p>
+                        <a href="">
+                            <button class="ui primary button marginb">zobacz profil</button>
+                        </a>
+                    </div>
+                    <div class="four wide column">
+                        <form action="{% url 'profiles:invite-accept' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="profile_pk" value={{ x.pk }}>
+                            <button type="submit" class="ui primary button marginb">
+                                <i class="check icon"></i>Zaakceptuj zaproszenie
+                            </button>
+                        </form>
+                        <form action="{% url 'profiles:invite-remove' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="profile_pk" value={{ x.pk }}>
+                            <button type="submit" class="ui primary button marginb">
+                                <i class="close icon"></i>Usuń zaproszenie
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock content %}

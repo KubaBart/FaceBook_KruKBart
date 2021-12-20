@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}aktualizacja posta{% endblock title %}
+{% block content %}
+    <div class="ui segment">
+        <h2>Edycja postu</h2>
+        <form action="" class="ui form" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form }}
+            <button type="submit" class="ui button primary margint">Zaktualizuj post</button>
+        </form>
+    </div>
+{% endblock content %}

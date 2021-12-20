@@ -1,6 +1,7 @@
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from django.dispatch import receiver
+from django.db.models.signals import pre_delete
 from .models import Profile, Relationship
 
 #połączenie i zapis usera z profilem
@@ -19,3 +20,13 @@ def post_save_add_to_friends(sender, instance, created, **kwargs):
         receiver_.friends.add(sender_.user)
         sender_.save()
         receiver_.save()
+
+#usunięcie ze znajomych (usunięcie występowania dwóch przycisków)
+@receiver(pre_delete, sender=Relationship)
+def pre_delete_friends_remove(sender, instance, **kwargs):
+    sender = instance.sender
+    receiver =instance.receiver
+    sender.friends.remove(receiver.user)
+    receiver.friends.remove(sender.user)
+    sender.save()
+    receiver.save()
