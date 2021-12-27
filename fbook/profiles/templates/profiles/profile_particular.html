@@ -98,6 +98,7 @@
             </div>
             <!--posty-->
             <div class="eleven wide column">
+            {% if request.user in object.friends.all %}
                 {% if post_user_len %}
                     {% for post in posts %}
                         <div class="ui segment fluid">
@@ -108,6 +109,9 @@
                         <h3>{{ object.user }}&nbspnie ma żadnych opublikowanych postów</h3>
 
                 {% endif %}
+            {% else %}
+                <h2>Nie jesteś znajomym tego użytkownika, podgląd postów tego użytkonika jest zabronione</h2>
+            {% endif %}
             </div>
         </div>
     </div>

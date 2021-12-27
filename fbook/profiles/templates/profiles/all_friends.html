@@ -1,13 +1,8 @@
 {% extends 'base.html' %}
-{% block title %}Nieznajomi{% endblock title %}
+{% block title %}Znajomi{% endblock title %}
 {% block content %}
-    <!--Jeśli nie ma żadnego profilu to wyświetl-->
-    {% if is_empty %}
-        <h3>Nie ma profilów</h3>
-    {% endif %}
-    <!--wyświetlanie użytkowników-->
-    {% for x in object_list %}
-        {% if request.user not in x.friends.all %}
+    {% for x in set_of_queries %}
+        {% if request.user in x.friends.all %}
         <div class="ui fluid card">
             <div class="content">
                 <div class="ui grid">
@@ -27,21 +22,15 @@
                             </a>
                         </div>
                         <div class="four wide column">
-                            <!--Jeśli użytkownik nie przyjaźni się z tym użytkownikem, oraz nie wysłał zaproszenia to można dodać go do znajomych-->
-                            {% if x.user not in receiver_relation_list and x.user not in sender_relation_list %}
-                                <form action="{% url 'profiles:invite-send' %}" method="POST">
+                        <!--Jeśli użytkownik się przyjaźni z danych użytkowniem to może go usunąć-->
+                            {% if request.user in x.friends.all %}
+                                <form action="{% url 'profiles:remove-friends' %}" method="POST">
                                 {% csrf_token %}
                                 <input type="hidden" name="profile_pk" value="{{ x.pk }}">
                                     <button type="submit" class="ui primary button marginb">
-                                        <i class="plus square icon"></i>Dodaj do znajomych
+                                        <i class="minus square icon"></i>Usuń ze znajomych
                                     </button>
                                 </form>
-                            {% endif %}
-                            <!--Jeśli wysłano już zaproszenie do znajomych-->
-                            {% if x.user in receiver_relation_list and request.user not in x.friends.all %}
-                                <button class="ui disable button">
-                                    <i class="user icon"></i>Wysłano zaproszenie
-                                </button>
                             {% endif %}
                         </div>
                     </div>

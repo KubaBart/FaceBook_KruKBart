@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "rejestracja zamknięta" %}{% endblock %}
+
+{% block content %}
+    <div class="ui grid">
+        <div class="five wide column"></div>
+        <div class="six wide column">
+            <div class="content margint">
+                <h1>{% trans "rejestracja zamknięta" %}</h1>
+                <p>{% trans "Przepraszamy, ale rejestracja jest obecnie niedostępna." %}</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -22,11 +22,11 @@ mój profil
                 <!--dzięki poniższej linijce będzie można wysyłać obraz oraz fromularz będzie miał semantykę -->
                 <form action="" method="POST" class="ui form" enctype='multipart/form-data'>
                     {% csrf_token %}
-                    {{ form_upd.as_p }}
+                    {{ form.as_p }}
             </div>
         </div>
         <div class="actions">
-            <button type='submit' class="ui positive right labeled icon button">
+            <button type="submit" class="ui positive right labeled icon button">
                 Zaktualizuj
                 <i class="checkmark icon"></i>
             </button>
@@ -37,11 +37,7 @@ mój profil
     <div class="ui segment">
         <!--jeśli aktualizacja się powiedzie to wyświetli się wiadomość w zielonej ramce-->
         {% if confirm_form %}
-        <div class="ui green message">Twój profil został zaktualizowany</div>
-        {% endif %}
-        <!--jeśli nie to czerwony komunikat-->
-        {% if not_confirm_form %}
-        <div class="ui red message">Twój profil nie został zaktualizowany</div>
+            <div class="ui green message">Twój profil został zaktualizowany</div>
         {% endif %}
         <h2>Mój profil: {{ request.user }}</h2>
         <!--układy wielokolumnowe-->

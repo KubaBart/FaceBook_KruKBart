@@ -1,11 +1,19 @@
+{% url 'posts:post-view' as posts_view_path %}
+{% url 'home-view' as home_view_path %}
+{% url 'profiles:profile-user-view' as profile_user_view_path %}
+{% url 'profiles:profile-invites' as profile_invites_view_path %}
+{% url 'profiles:profiles-friends' as profile_friends_view_path %}
+{% url 'profiles:profiles-all' as profile_all_view_path %}
+
 <!--pasek nawigacyjny-->
 <div class="ui inverted menu nav marginb">
     <div class="ui container">
-        <a href="" class="item">
+        <a href="{{ home_view_path }}" class="{% if request.path == home_view_path %}active{% endif %} item">
             <h3>fbook</h3>
         </a>
         {% if request.user.is_authenticated %}
-        <a href="" class="item">Strona główna</a>
+            <!--jeśli ścieżka żądania jest równa postom ścieżki, dodana zostaje aktywna klasa-->
+        <a href="{{ posts_view_path }}" class="{% if request.path == posts_view_path %}active{% endif %} item">Strona główna</a>
     {% endif %}
         <div class="right menu">
             {% if request.user.is_authenticated %}
@@ -22,16 +30,18 @@
                     <div class="ui floating dropdown icon button teal"> Znajomi
                         <i class="dropdown icon"></i>
                         <div class="menu">
-                            <a href="" class="item">Wszystkie profile</a>
-                            <a href="" class="item">Wyślij zaproszenie</a>
-                            <a href="" class="item">Otrzymane zaproszenia</a>
+                            <a href="{{ profile_all_view_path }}" class="{% if request.path == profile_all_view_path %}active{% endif %} item">Nieznajomi</a>
+                            <a href="{{ profile_invites_view_path }}" class="{% if request.path == profile_invites_view_path %}active{% endif %} item">Otrzymane zaproszenia &nbsp;
+                                <div class="ui green horizontal label">{{ count_invites_r }}</div></a>
+                            <a href="{{ profile_friends_view_path }}" class="{% if request.path == profile_friends_view_path %}active{% endif %} item">Znajomi</a>
                         </div>
                     </div>
                 </div>
-                <a href="" class="item">{{ request.user }}</a>
-                <a href="" class="ui item">Wyloguj</a>
+                <a href="{{ profile_user_view_path }}" class="{% if request.path == profile_user_view_path %}active{% endif %} item">
+                    <img src={{ picture.url }} class="ui avatar image">&nbsp;{{ request.user }}</a>
+                <a href="{% url 'account_logout' %}" class="ui item">Wyloguj</a>
                 {% else %}
-                <a href="" class="ui item">Login</a>
+                <a href="{% url 'account_login' %}" class="ui item">Login</a>
                 {% endif %}
         </div>
     </div>

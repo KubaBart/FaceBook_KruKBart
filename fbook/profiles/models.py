@@ -15,8 +15,8 @@ class ProfileManage(models.Manager):
         profiles = Profile.objects.all().exclude(user=myprof)
         return profiles
 
-    #wszystkie profile które możemy zaprosić (z którymi nie mamy relacji)
-    def get_profiles_all_invite(self, sender):
+    #wszystkie profile z którymi jesteśmy znajomymi
+    def get_profiles_all_friends(self, sender):
         profiles = Profile.objects.all().exclude(user=sender)
         profile = Profile.objects.get(user=sender)
         #wszystkie relacje w których jesteśmy nadawcą lub odbiorcą zaproszenia
@@ -31,8 +31,8 @@ class ProfileManage(models.Manager):
                 invites_accepted.add(relation.receiver)
                 invites_accepted.add(relation.sender)
         print(invites_accepted)
-        #wszystkie dostępne profile do zaproszenia oprócz własnego profilu oraz dodanych znajomych
-        profiles_to_invite = [profile for profile in profiles if profile not in invites_accepted]
+        #wszyscy znajomi oprócz swojego profilu
+        profiles_to_invite = [profile for profile in profiles if profile in invites_accepted]
         print(profiles_to_invite)
         return profiles_to_invite
 

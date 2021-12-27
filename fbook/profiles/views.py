@@ -5,38 +5,39 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin as LRM
 from .models import Profile
 from .models import Relationship
 from .form_update import ProfileModelForm
 
 #widok pojedynczego usera, poprzez przekazanie informacji usera
 #widok aktualizacji profilu
+@login_required
 def profileuser_view(request):
     profile = Profile.objects.get(user=request.user)
 
     # aktualizowanie konkretnego profilu
-    form_upd = ProfileModelForm(request.POST or None, request.FILES or None, instance=profile )
+    form = ProfileModelForm(request.POST or None, request.FILES or None, instance=profile )
     confirm_form = False
-    not_confirm_form = False
 
     #sprawdzenie poprawności, czy formularz jest poprawny
     if request.method == 'POST':
-        if form_upd.is_valid():
-            form_upd.save()
+        if form.is_valid():
+            form.save()
             confirm_form = True
-        else:
-            not_confirm_form = True
 
     #zmienne kontekstowe
     context = {
         'profile' : profile,
-        'form_upd' : form_upd,
+        'form' : form,
         'confirm_form': confirm_form,
     }
     #zwrócenie widoku
     return render(request, 'profiles/profileuser.html', context)
 
 #widok otrzymanego zaproszenia
+@login_required
 def invites_received(request):
     profile = Profile.objects.get(user=request.user)
     set_of_queries = Relationship.objects.invatations_received(profile)
@@ -54,6 +55,7 @@ def invites_received(request):
     return render(request, 'profiles/profilinvites.html', context)
 
 #lista profili
+@login_required
 def list_of_profiles(request):
     user = request.user
     set_of_queries = Profile.objects.get_profiles_all(user)
@@ -66,18 +68,19 @@ def list_of_profiles(request):
     return render(request, 'profiles/list_profiles.html', context)
 
 #lista możliwych zaproszeń
-def list_of_profiles_to_invites(request):
+@login_required
+def list_of_profiles_friends(request):
     user = request.user
-    set_of_queries = Profile.objects.get_profiles_all_invite(user)
+    set_of_queries = Profile.objects.get_profiles_all_friends(user)
 
     # zmienne kontekstowe
     context = {
         'set_of_queries': set_of_queries,
     }
     # zwrócenie widoku
-    return render(request, 'profiles/available_invites.html', context)
+    return render(request, 'profiles/all_friends.html', context)
 
-class ProfileList(ListView):
+class ProfileList(LRM ,ListView):
     #określenie modelu
     model = Profile
     #wskazanie szablonu do widoku
@@ -114,6 +117,7 @@ class ProfileList(ListView):
         return context
 
 #wysyłanie zaproszeń do znajomych
+@login_required
 def invatation_send(request):
     #jeśli mamy do czynienia z żądaniem post, uzyskujemy dostęp do tego adresu URL który zamierzamy zarejestrować
     if request.method=="POST":
@@ -126,6 +130,7 @@ def invatation_send(request):
     return redirect('profiles:profile-user-view')
 
 #usuwanie ze znajomych
+@login_required
 def remove_friend(request):
     if request.method=="POST":
         pk = request.POST.get('profile_pk')
@@ -139,6 +144,7 @@ def remove_friend(request):
     return redirect('profiles:profile-user-view')
 
 #widok zaakceptowanego zaproszenia
+@login_required
 def invite_accept(request):
     if request.method == "POST":
         pk = request.POST.get('profile_pk')
@@ -151,6 +157,7 @@ def invite_accept(request):
     return redirect('profiles:profile-invites')
 
 #widok usuniętego zaproszenia
+@login_required
 def invite_remove(request):
     if request.method == "POST":
         pk = request.POST.get('profile_pk')
@@ -161,7 +168,7 @@ def invite_remove(request):
     return redirect('profiles:profile-invites')
 
 #widok profilu innego użytkownika
-class ProfileDetail(DetailView):
+class ProfileDetail(LRM ,DetailView):
     model = Profile
     template_name = 'profiles/profile_particular.html'
     def get_object(self, slug=None):

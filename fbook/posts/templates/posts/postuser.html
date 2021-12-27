@@ -19,6 +19,42 @@
                     shw=true
                 }
             });
+
+            $('.like-form').submit(function(e){
+                //uniemożliwienie odświeżania się strony
+                e.preventDefault()
+                const post_id = $(this).attr('id')
+                const likeText = $(`.like-btn${ post_id }`).text()
+                const trim = $.trim(likeText)
+                const url = $(this).attr('action')
+                let res;
+                const likes = $(`.like-count${ post_id }`).text()
+                const trimCount = parseInt(likes)
+                $.ajax({
+                    //typ
+                    type:'POST',
+                    //ustawienie adresu url
+                    url: url,
+                    data:{
+                        'csrfmiddlewaretoken' : $('input[name=csrfmiddlewaretoken]').val(),
+                        'post_id' : post_id
+                    },
+                    success: function(response){
+                        if(trim==='Unlike'){
+                            $(`.like-btn${ post_id }`).text('Like')
+                            res = trimCount -1
+                        }
+                        else{
+                            $(`.like-btn${ post_id }`).text('Unlike')
+                            res = trimCount +1
+                        }
+                        $(`.like-count${ post_id }`).text(res)
+                    },
+                    error: function(response){
+                        console.log('error', response)
+                    }
+                })
+            });
         });
     </script>
 {% endblock scripts %}
@@ -69,23 +105,30 @@
                     <div class="content">
                         <p> {{ x.content }} </p>
                         <div class="right floated">
-                            <form action="{% url 'posts:like-post' %}" method="POST">
+                            <form action="{% url 'posts:like-post' %}" method="POST" class="like-form" id="{{ x.id }}">
                             <!--ochrona prze fałszowaniem żądań pomiędzy witrynami-->
                                 {% csrf_token %}
                             <input type="hidden" name="post_id" value={{x.id}}>
-                            <!--jeśli polubione-->
-                            {% if profile in x.liked.all %}
-                                <!--kciuk w górę-->
-                                <button type="submit" class="ui primary button margint w-full"><i class="thumbs up icon"></i></button>
-                                <!--liczba polubień-->
-                                <span> {{x.likes_number}} Polubień</span>
-                            <!--jęsli nie polubione-->
-                            {% else %}
-                                <!--kciuk w dół-->
-                                <button type="submit" class="ui primary button margint w-full"><i class="thumbs down icon"></i></button>
-                                <!--liczba polubień-->
-                                <span> {{x.likes_number}} Polubień</span>
-                            {% endif %}
+                                <button type="submit" class="ui primary button like-btn{{ x.id }}">
+                                    <!--jeśli polubione-->
+                                    {% if profile not in x.liked.all %}
+                                        Like
+                                    <!--w przeciwnym wypadku-->
+                                    {% else %}
+                                        Unlike
+                                    {% endif %}
+                                    <!--liczba polubień-->
+                                </button>
+                                <div class="ui grid">
+                                    <div class="column">
+                                        <div class="like-count{{ x.id }}">
+                                            {{x.likes_number}}
+                                        </div>
+                                    </div>
+                                    <div class="column">
+                                        Polubień
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </div>

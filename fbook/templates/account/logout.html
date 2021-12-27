@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Wyloguj się" %}{% endblock %}
+
+{% block content %}
+    <div class="ui grid">
+        <div class="five wide column"></div>
+        <div class="six wide column">
+            <div class="content margint">
+                <h1>{% trans 'Czy chcesz się wylogować ?' %}</h1>
+                <form method="post" action="{% url 'account_logout' %}">
+                    {% csrf_token %}
+                    {% if redirect_field_value %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+                    {% endif %}
+                    <button class="ui button primary" type="submit">{% trans 'wyloguj się' %}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

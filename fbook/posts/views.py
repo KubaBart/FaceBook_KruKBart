@@ -2,12 +2,17 @@ from django.shortcuts import render, redirect
 from django.views.generic import UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin as LRM
+from django.http import JsonResponse
 from .models import Post, Like
 from profiles.models import Profile
 from .form_post import PostModelForm
 from .form_post import CommentModelForm
 
 #widok tworzenia komentarzy
+#login_requred to zabezpieczenie strony, wymaga zalogowania się
+@login_required
 def post_create_comment(request):
 
     # przechowywanie wszystkich obiektów w zmiennej
@@ -66,7 +71,7 @@ def post_create_comment(request):
 
     # zwrócenie widoku, powyższych kluczy można potem użyć w .html
     return render(request, 'posts/postuser.html', context)
-
+@login_required
 def like_unlike_post(request):
     # jeśli użytkownik jest zalogowany to ustaw na tego użytkownika
     user = request.user
@@ -100,11 +105,17 @@ def like_unlike_post(request):
             post_x.save()
             like.save()
 
+        data = {
+            'value' : like.value,
+            'likes' : post_x.liked.all().count(),
+        }
+        return JsonResponse(data, safe=False)
+
     # zwrócenie widoku postu
     return redirect('posts:post-view')
 
 #klasa do edycji posta
-class PostUpdate(UpdateView):
+class PostUpdate(LRM ,UpdateView):
     form_class = PostModelForm
     model = Post
     #wskazanie szablonu
@@ -122,7 +133,7 @@ class PostUpdate(UpdateView):
             return super().form_valid(form)
 
 # klasa usuwania formularza
-class PostDelete(DeleteView):
+class PostDelete(LRM ,DeleteView):
     #określenie modelu
     model = Post
     # wskazanie szablonu

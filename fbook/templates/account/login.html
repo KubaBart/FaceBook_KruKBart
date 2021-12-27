@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block head_title %}{% trans "Zaloguj się" %}{% endblock %}
+
+{% block content %}
+    <div class="ui grid">
+        <div class="five wide column"></div>
+        <div class="six wide column">
+            <div class="content margint">
+                <h1>{% trans "Zaloguj się" %}</h1>
+                {% get_providers as socialaccount_providers %}
+                <p>{% blocktrans %}Jeśli jeszcze nie utworzyłeś konta, proszę
+                <a href="{{ signup_url }}">zarejestruj się</a>{% endblocktrans %}</p>
+                <form class="login ui form" method="POST" action="{% url 'account_login' %}">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    {% if redirect_field_value %}
+                        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                    {% endif %}
+                    <button class="ui button primary" type="submit">{% trans "login" %}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
