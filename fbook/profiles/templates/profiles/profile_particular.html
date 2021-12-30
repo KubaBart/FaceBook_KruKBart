@@ -1,6 +1,27 @@
 {% extends 'base.html' %}
 {%  block title %}Zobacz profil użytkownika
 {% endblock title %}
+{% block scripts %}
+    <script>
+        $( document ).ready(function() {
+            let shw = true
+            $(".clicksw").click(function () {
+                //jeśli komentarze są pokazane/rozsunięte
+                if (shw===true) {
+                    //to po kliknięciu komentarz zostają schowane szybko
+                    $(this).next(".comment-box").hide("fast");
+                    shw=false
+                }
+                //Jeśli komentarze są schowane
+                else {
+                    //to po kliknięciu pokaż komentarze/rozsuń szybko
+                    $(this).next(".comment-box").show("fast");
+                    shw=true
+                }
+            });
+        });
+    </script>
+{% endblock scripts %}
 {%  block content %}
     <div class="ui grid">
         <br>
@@ -101,8 +122,63 @@
             {% if request.user in object.friends.all %}
                 {% if post_user_len %}
                     {% for post in posts %}
-                        <div class="ui segment fluid">
-                            {{ post.content }}
+                        <div class="ui fluid card">
+				            <div class="content">
+                                <!--reprezentacja stringu, nazwa użytkownika i czas kiedy został dodany post-->
+                                <img class="ui avatar image" src={{post.author.avatar.url}}>
+                                {{ post.author.user }} &nbsp {{ post.created|timesince}} temu
+                            </div>
+                            <div class="ui fluid image">
+                                {% if post.image %}
+                                    <img src={{post.image.url}}>
+                                {% endif %}
+                            </div>
+                            <div class="content">
+                                <p> {{ post.content }} </p>
+                                <div class="right floated">
+                                    <form action="{% url 'posts:like-post' %}" method="POST" class="like-form" id="{{ post.id }}">
+                                    <!--ochrona prze fałszowaniem żądań pomiędzy witrynami-->
+                                        {% csrf_token %}
+                                    <input type="hidden" name="post_id" value={{post.id}}>
+                                        <!--liczba polubień-->
+                                        <div class="ui grid">
+                                            <div class="column">
+                                                <div class="like-count{{ post.id }}">
+                                                    {{post.likes_number}}
+                                                </div>
+                                            </div>
+                                            <div class="column">
+                                                Polubień
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="extra content">
+                                <div class="marginb"></div>
+                                <i class="comment icon"></i>
+                                <!--liczba komentarzy-->
+                                <span> {{ post.comments_count }} komentarzy</span>
+                                <br><br>
+                                <!--pokazywanie i ukrywanie komentarzy, wykonywanie jest za pomocą skryptu java script-->
+                                <button class="clicksw ui button marginb">pokaż/schowaj komentarze</button>
+                                <div class="comment-box">
+                                    <!--Jeśli komentarz istnieje-->
+                                    {% if post.comment_set.all %}
+                                        <!--to przeglądamy je w pętli, wyświetlane są na ekranie od najmłodszego na górze do najstarszego na dole-->
+                                        {% for i in post.comment_set.all %}
+                                            <div class="ui segment marginb">
+                                                <img class="ui avatar image" src={{i.user.avatar.url}}>
+                                                <!--user i czas kiedy został komentarz utworzony-->
+                                                <span>{{ i.user.user }}&nbsp{{ i.created|timesince}}&nbsptemu</span>
+                                                    <div class='margint'>
+                                                        {{ i.body }}
+                                                    </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                     {% endfor %}
                     {% else %}

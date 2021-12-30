@@ -60,9 +60,9 @@
 {% endblock scripts %}
 {% block content %}
 	<div class="ui grid">
-    <!--układ wielokolumnowy-->
+        <!--układ wielokolumnowy-->
 		<div class="fourteen wide column">
-        <div class="ui segment">
+            <div class="ui segment">
                 {% if new_post %}
                     <!--Wiadomość w zielonym okienku-->
                     <div class="ui green message">Dodano nowy post</div>
@@ -78,92 +78,92 @@
             </div>
             <!--wyświetlane posty są od najmłodszego (na górze) do najstarszego (na dole)-->
 			{% for x in set_of_queries reversed %}
-                <!--karta-->
-    			<div class="ui fluid card">
-				    <div class="content">
-					    <div class="right floated meta">
-					        <div class="ui grid">
-						        <div class="row">
-                                <!--Jeśli jest to użytkownik który upublicznił ten post to ujrzy przyciski usuń lub edytuj-->
-                                    {% if request.user == x.author.user %}
-                                        <!--należy przekazać oprócz adresu jeszcze klucz główny-->
-                                        <a href="{% url 'posts:post-edit' x.pk %}"><button class="ui button transparent_bg ">Edytuj</button></a>
-								        <a href="{% url 'posts:post-delete' x.pk %}"><button class="ui button transparent_bg ">Usuń</button></a>
-							        {% endif %}
-						        </div>
-					        </div>
+                {% if request.user in x.author.friends.all or request.user == x.author.user %}
+                    <!--karta-->
+    			    <div class="ui fluid card">
+				        <div class="content">
+					        <div class="right floated meta">
+					            <div class="ui grid">
+						            <div class="row">
+                                    <!--Jeśli jest to użytkownik który upublicznił ten post to ujrzy przyciski usuń lub edytuj-->
+                                        {% if request.user == x.author.user %}
+                                            <!--należy przekazać oprócz adresu jeszcze klucz główny-->
+                                            <a href="{% url 'posts:post-edit' x.pk %}"><button class="ui button transparent_bg ">Edytuj</button></a>
+								            <a href="{% url 'posts:post-delete' x.pk %}"><button class="ui button transparent_bg ">Usuń</button></a>
+							            {% endif %}
+						            </div>
+					            </div>
+                            </div>
+                            <!--reprezentacja stringu, nazwa użytkownika i czas kiedy został dodany post-->
+                            <img class="ui avatar image" src={{x.author.avatar.url}}>
+                            {{ x.author.user }} &nbsp {{ x.created|timesince}} temu
                         </div>
-                        <!--reprezentacja stringu, nazwa użytkownika i czas kiedy został dodany post-->
-                        <img class="ui avatar image" src={{x.author.avatar.url}}>
-                        {{ x.author.user }} &nbsp {{ x.created|timesince}} temu
-                    </div>
-                    <div class="ui fluid image">
-                        {% if x.image %}
-                            <img src={{x.image.url}}>
-                        {% endif %}
-                    </div>
-                    <div class="content">
-                        <p> {{ x.content }} </p>
-                        <div class="right floated">
-                            <form action="{% url 'posts:like-post' %}" method="POST" class="like-form" id="{{ x.id }}">
-                            <!--ochrona prze fałszowaniem żądań pomiędzy witrynami-->
-                                {% csrf_token %}
-                            <input type="hidden" name="post_id" value={{x.id}}>
-                                <button type="submit" class="ui primary button like-btn{{ x.id }}">
-                                    <!--jeśli polubione-->
-                                    {% if profile not in x.liked.all %}
-                                        Like
-                                    <!--w przeciwnym wypadku-->
-                                    {% else %}
-                                        Unlike
-                                    {% endif %}
+                        <div class="ui fluid image">
+                            {% if x.image %}
+                                <img src={{x.image.url}}>
+                            {% endif %}
+                        </div>
+                        <div class="content">
+                            <p> {{ x.content }} </p>
+                            <div class="right floated">
+                                <form action="{% url 'posts:like-post' %}" method="POST" class="like-form" id="{{ x.id }}">
+                                <!--ochrona prze fałszowaniem żądań pomiędzy witrynami-->
+                                    {% csrf_token %}
+                                <input type="hidden" name="post_id" value={{x.id}}>
+                                    <button type="submit" class="ui primary button like-btn{{ x.id }}">
+                                        <!--jeśli polubione-->
+                                        {% if profile not in x.liked.all %}Like
+                                        <!--w przeciwnym wypadku-->
+                                        {% else %}Unlike
+                                        {% endif %}
+                                    </button>
                                     <!--liczba polubień-->
-                                </button>
-                                <div class="ui grid">
-                                    <div class="column">
-                                        <div class="like-count{{ x.id }}">
-                                            {{x.likes_number}}
+                                    <div class="ui grid">
+                                        <div class="column">
+                                            <div class="like-count{{ x.id }}">
+                                                {{x.likes_number}}
+                                            </div>
+                                        </div>
+                                        <div class="column">
+                                            Polubień
                                         </div>
                                     </div>
-                                    <div class="column">
-                                        Polubień
-                                    </div>
-                                </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="extra content">
+                            <div class="marginb"></div>
+                            <i class="comment icon"></i>
+                            <!--liczba komentarzy-->
+                            <span> {{ x.comments_count }} komentarzy</span>
+                            <br><br>
+                            <!--pokazywanie i ukrywanie komentarzy, wykonywanie jest za pomocą skryptu java script-->
+                            <button class="clicksw ui button marginb">pokaż/schowaj komentarze</button>
+                            <div class="comment-box">
+                                <!--Jeśli komentarz istnieje-->
+                                {% if x.comment_set.all %}
+                                    <!--to przeglądamy je w pętli, wyświetlane są na ekranie od najmłodszego na górze do najstarszego na dole-->
+                                    {% for i in x.comment_set.all %}
+                                        <div class="ui segment marginb">
+                                            <img class="ui avatar image" src={{i.user.avatar.url}}>
+                                            <!--user i czas kiedy został komentarz utworzony-->
+                                            <span>{{ i.user.user }}&nbsp{{ i.created|timesince}}&nbsptemu</span>
+                                                <div class='margint'>
+                                                    {{ i.body }}
+                                                </div>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <form class='ui fluid form' action="" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="post_id" value={{x.id}}>
+                                    {{ form_comment }}
+                                <button type="submit" class="ui primary button margint w-full" name="submit_form_comment">Opublikuj komentarz</button>
                             </form>
                         </div>
                     </div>
-                    <div class="extra content">
-                        <div class="marginb"></div>
-                        <i class="comment icon"></i>
-                        <!--liczba komentarzy-->
-                        <span> {{ x.comments_count }} komentarzy</span>
-                        <br><br>
-                        <!--pokazywanie i ukrywanie komentarzy, wykonywanie jest za pomocą skryptu java script-->
-                        <button class="clicksw ui button marginb">pokaż/schowaj komentarze</button>
-                        <div class="comment-box">
-                            <!--Jeśli komentarz istnieje-->
-                            {% if x.comment_set.all %}
-                                <!--to przeglądamy je w pętli, wyświetlane są na ekranie od najmłodszego na górze do najstarszego na dole-->
-                                {% for i in x.comment_set.all %}
-                                    <div class="ui segment marginb">
-                                        <img class="ui avatar image" src={{i.user.avatar.url}}>
-                                        <!--user i czas kiedy został komentarz utworzony-->
-                                        <span>{{ i.user.user }}&nbsp{{ i.created|timesince}}&nbsptemu</span>
-                                            <div class='margint'>
-                                                {{ i.body }}
-                                            </div>
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
-                         </div>
-                        <form class='ui fluid form' action="" method="POST">
-                            {% csrf_token %}
-                            <input type="hidden" name="post_id" value={{x.id}}>
-                                {{ form_comment }}
-                            <button type="submit" class="ui primary button margint w-full" name="submit_form_comment">Opublikuj komentarz</button>
-                        </form>
-                    </div>
-                </div>
+                {% endif %}
             {% endfor %}
         </div>
     </div>
