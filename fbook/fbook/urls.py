@@ -19,6 +19,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .views import home_view
 
+from .views import search_friends
+
 #Uwzględnienie innych plików url, połączenie
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,6 +28,8 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('profiles/', include('profiles.urls',namespace='profiles')),
     path('posts/', include('posts.urls',namespace='posts')),
+
+    path('search_friends/', search_friends, name='search-friends'),
 ]
 
 urlpatterns +=static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -5,6 +5,7 @@
 {% url 'profiles:profiles-friends' as profile_friends_view_path %}
 {% url 'profiles:profiles-all' as profile_all_view_path %}
 
+
 <!--pasek nawigacyjny-->
 <div class="ui inverted menu nav marginb">
     <div class="ui container">
@@ -18,9 +19,10 @@
         <div class="right menu">
             {% if request.user.is_authenticated %}
                  <div class="item">
-                    <form action="" method="GET">
+                    <form action="{% url 'search-friends' %}" method=POST>
                         <div class="ui action left icon input">
-                            <input class="prompt" type="text" name='q' placeholder="">
+                            {% csrf_token %}
+                            <input class="prompt" type="text" name="que" placeholder="wyszukaj znajomego">
                             <i class="search icon"></i>
                             <button type='submit' class="ui button">Znajdź</button>
                         </div>

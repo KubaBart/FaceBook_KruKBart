@@ -19,5 +19,5 @@ urlpatterns = [
     path('removefriends/', remove_friend, name='remove-friends'),
     path('inviteremove/', invite_remove, name='invite-remove'),
     path('inviteaccept/', invite_accept, name='invite-accept'),
-    path('<slug>/', ProfileDetail.as_view(), name='profile-detail')
+    path('<slug>/', ProfileDetail.as_view(), name='profile-detail'),
 ]

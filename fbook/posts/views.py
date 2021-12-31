@@ -9,14 +9,19 @@ from .models import Post, Like
 from profiles.models import Profile
 from .form_post import PostModelForm
 from .form_post import CommentModelForm
+from django.db.models import Count
 
 #widok tworzenia komentarzy
 #login_requred to zabezpieczenie strony, wymaga zalogowania się
 @login_required
 def post_create_comment(request):
 
-    # przechowywanie wszystkich obiektów w zmiennej
-    set_of_queries = Post.objects.all()
+    # przechowywanie wszystkich obiektów w zmiennej według liczby like
+    set_of_queries = Post.objects.annotate(q_count=Count('liked')).order_by('q_count')
+
+    #pobieranie określonej ilości postów
+    #set_of_queries = Post.objects.all().[:5]
+
     profile = Profile.objects.get(user=request.user)
 
     form_post = PostModelForm()

@@ -23,10 +23,9 @@ class Post(models.Model):
     def comments_count(self):
         return self.comment_set.all().count()
 
-
     #komentarz posegregowane od najnowszego na górze do najstarszego na dole
     class comments:
-        ordering = ('-created',)
+        ordering = ('-author',)
 
 #klasa komentarze
 class Comment(models.Model):
